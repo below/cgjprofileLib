@@ -9,6 +9,11 @@
 
 import Foundation
 
+let ANSI_COLOR_RED = "\u{001b}[31m"
+let ANSI_COLOR_GREEN = "\u{001b}[32m"
+let ANSI_COLOR_YELLOW = "\u{001b}[33m"
+let ANSI_COLOR_RESET = "\u{001b}[0m"
+
 /// A wrapper for `Mobileprovision` to allow formatted output
 public class PrettyProvision: Mobileprovision {
 
@@ -138,10 +143,6 @@ public class PrettyProvision: Mobileprovision {
             var output = formatter.string(from: self.expirationDate)
             if markExpired {
                 let days = self.daysToExpiration
-                let ANSI_COLOR_RED = "\u{001b}[31m"
-                let ANSI_COLOR_GREEN = "\u{001b}[32m"
-                let ANSI_COLOR_YELLOW = "\u{001b}[33m"
-                let ANSI_COLOR_RESET = "\u{001b}[0m"
                 var color = ANSI_COLOR_GREEN
                 if days <= 0 {
                     color = ANSI_COLOR_RED

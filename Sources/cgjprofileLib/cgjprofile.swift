@@ -68,7 +68,7 @@ public final class CgjProfileCore {
     public static func analyzeMobileProfiles (format: String? = nil, pathsUDIDsOrNames: [String]? = nil,  warnDays: Int? = nil, quiet quietArg: Bool? = false) throws -> Int32 {
         
         var result = EXIT_SUCCESS
-
+        
         let workingPaths : [String] = pathsUDIDsOrNames ?? CgjProfileCore.profilePaths()
         let quiet = quietArg ?? false
         
@@ -83,9 +83,6 @@ public final class CgjProfileCore {
                 if !quiet {
                     provision.print(format: format ?? "%u %t %n", warnDays:warnDays)
                 }
-                let ANSI_COLOR_RED = "\u{001b}[31m"
-                let ANSI_COLOR_YELLOW = "\u{001b}[33m"
-                let ANSI_COLOR_RESET = "\u{001b}[0m"
                 let daysToExpiration = provision.daysToExpiration
                 if daysToExpiration <= 0 {
                     
