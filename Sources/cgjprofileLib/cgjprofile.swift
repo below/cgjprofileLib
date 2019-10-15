@@ -12,6 +12,10 @@ import Darwin
 
 public final class CgjProfileCore {
     
+    enum CgjProfileError : Error {
+        case regexInvalid(String)
+    }
+    
     static var mobileProvisionURL: URL = {
         let fm = FileManager.default
         let librayURL = fm.urls(for: .libraryDirectory, in: .userDomainMask).first!
@@ -65,9 +69,18 @@ public final class CgjProfileCore {
         If no format string is provided, the default is "%u %t %n"
     */
 
-    public static func analyzeMobileProfiles (format: String? = nil, pathsUDIDsOrNames: [String]? = nil,  warnDays: Int? = nil, quiet quietArg: Bool? = false) throws -> Int32 {
+    public static func analyzeMobileProfiles (format: String? = nil, pathsUDIDsOrNames: [String]? = nil, regEx: String? = nil, warnDays: Int? = nil, quiet quietArg: Bool? = false) throws -> Int32 {
         
         var result = EXIT_SUCCESS
+        var regExParser: NSRegularExpression?
+        
+        if let regEx = regEx {
+            do {
+            regExParser = try NSRegularExpression(pattern: regEx, options: .caseInsensitive)
+            } catch {
+                throw CgjProfileError.regexInvalid(regEx)
+            }
+        }
         
         let workingPaths : [String] = pathsUDIDsOrNames ?? CgjProfileCore.profilePaths()
         let quiet = quietArg ?? false
@@ -80,6 +93,24 @@ public final class CgjProfileCore {
                 url = CgjProfileCore.mobileProvisionURL.appendingPathComponent(path)
             }
             if let provision = PrettyProvision(url: url) {
+                
+                if let regExParser = regExParser {
+                    var searchString: String = provision.appIDName + provision.teamName + provision.name
+                    for team in provision.teamIdentifier {
+                        searchString.append(team)
+                    }
+                    for certificate in provision.developerCertificates {
+                        do {
+                            searchString.append(try certificate.displayName())
+                        } catch {
+                        }
+                    }
+                    let range: NSRange = NSRange(searchString.startIndex..<searchString.endIndex, in: searchString)
+                    if regExParser.firstMatch(in: searchString, options: [], range: range) == nil {
+                        continue
+                    }
+                }
+                
                 if !quiet {
                     provision.print(format: format ?? "%u %t %n", warnDays:warnDays)
                 }
