@@ -44,7 +44,20 @@ public class PrettyProvision: Mobileprovision {
         if let warnDays = warnDays, warnDays > 0 {
             self.warnDays = warnDays
         }
-        fputs (parsedOutput(format)+"\n", stdout)
+        var output = parsedOutput(format)+"\n"
+        if markExpired {
+            var markColor = ""
+            if self.daysToExpiration <= 0 {
+                markColor = ANSI_COLOR_RED
+            } else if self.daysToExpiration <= self.warnDays {
+                markColor = ANSI_COLOR_YELLOW
+            }
+            output = markColor + output
+            if markColor.count > 0 {
+                output.append(ANSI_COLOR_RESET)
+            }
+        }
+        fputs (output, stdout)
     }
 
     /**
