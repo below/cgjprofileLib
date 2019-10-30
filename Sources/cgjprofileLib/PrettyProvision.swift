@@ -93,7 +93,7 @@ public class PrettyProvision: Mobileprovision {
         return output
     }
     
-    fileprivate func parseNonFormatString(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
+    internal func parseNonFormatString(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
         var index = startIndex
         var output = "";
 
@@ -112,7 +112,7 @@ public class PrettyProvision: Mobileprovision {
         return (output, index)
     }
     
-    fileprivate func parseFormat(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
+    internal func parseFormat(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
         var index = startIndex
         guard index < string.endIndex else {
             return ("", index)
@@ -150,7 +150,7 @@ public class PrettyProvision: Mobileprovision {
         }
     }
 
-    fileprivate func value(forFormat input: Character) -> String {
+    internal func value(forFormat input: Character) -> String {
         switch input {
         case "e":
             var output = formatter.string(from: self.expirationDate)
@@ -182,7 +182,7 @@ public class PrettyProvision: Mobileprovision {
         }
     }
     
-    fileprivate func parseInteger(fromString string: String, startIndex: String.Index) -> (Int, String.Index) {
+    internal func parseInteger(fromString string: String, startIndex: String.Index) -> (Int, String.Index) {
         var numberString : String = ""
         var index = startIndex
         guard index < string.endIndex else {
