@@ -9,6 +9,11 @@
 
 import Foundation
 
+let ANSI_COLOR_RED = "\u{001b}[31m"
+let ANSI_COLOR_GREEN = "\u{001b}[32m"
+let ANSI_COLOR_YELLOW = "\u{001b}[33m"
+let ANSI_COLOR_RESET = "\u{001b}[0m"
+
 /// A wrapper for `Mobileprovision` to allow formatted output
 public class PrettyProvision: Mobileprovision {
 
@@ -39,7 +44,20 @@ public class PrettyProvision: Mobileprovision {
         if let warnDays = warnDays, warnDays > 0 {
             self.warnDays = warnDays
         }
-        fputs (parsedOutput(format)+"\n", stdout)
+        var output = parsedOutput(format)+"\n"
+        if markExpired {
+            var markColor = ""
+            if self.daysToExpiration <= 0 {
+                markColor = ANSI_COLOR_RED
+            } else if self.daysToExpiration <= self.warnDays {
+                markColor = ANSI_COLOR_YELLOW
+            }
+            output = markColor + output
+            if markColor.count > 0 {
+                output.append(ANSI_COLOR_RESET)
+            }
+        }
+        fputs (output, stdout)
     }
 
     /**
@@ -75,7 +93,7 @@ public class PrettyProvision: Mobileprovision {
         return output
     }
     
-    fileprivate func parseNonFormatString(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
+    internal func parseNonFormatString(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
         var index = startIndex
         var output = "";
 
@@ -94,7 +112,7 @@ public class PrettyProvision: Mobileprovision {
         return (output, index)
     }
     
-    fileprivate func parseFormat(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
+    internal func parseFormat(fromString string: String, startIndex : String.Index) -> (String, String.Index) {
         var index = startIndex
         guard index < string.endIndex else {
             return ("", index)
@@ -132,16 +150,12 @@ public class PrettyProvision: Mobileprovision {
         }
     }
 
-    fileprivate func value(forFormat input: Character) -> String {
+    internal func value(forFormat input: Character) -> String {
         switch input {
         case "e":
             var output = formatter.string(from: self.expirationDate)
             if markExpired {
                 let days = self.daysToExpiration
-                let ANSI_COLOR_RED = "\u{001b}[31m"
-                let ANSI_COLOR_GREEN = "\u{001b}[32m"
-                let ANSI_COLOR_YELLOW = "\u{001b}[33m"
-                let ANSI_COLOR_RESET = "\u{001b}[0m"
                 var color = ANSI_COLOR_GREEN
                 if days <= 0 {
                     color = ANSI_COLOR_RED
@@ -168,7 +182,7 @@ public class PrettyProvision: Mobileprovision {
         }
     }
     
-    fileprivate func parseInteger(fromString string: String, startIndex: String.Index) -> (Int, String.Index) {
+    internal func parseInteger(fromString string: String, startIndex: String.Index) -> (Int, String.Index) {
         var numberString : String = ""
         var index = startIndex
         guard index < string.endIndex else {

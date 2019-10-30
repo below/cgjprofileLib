@@ -9,13 +9,13 @@
 
 import Foundation
 import XCTest
-@testable import cgjprofileCore
+@testable import cgjprofileLib
 
 class CgjprofileToolTests: XCTestCase {
     
     var provisionData : Data!
     var url : URL!
-    var tool = cgjprofileTool()
+    var tool = CgjProfileCore()
     var mobileprovision : Mobileprovision!
     var prettyprovision : PrettyProvision!
     
@@ -124,19 +124,19 @@ class CgjprofileToolTests: XCTestCase {
 
     }
     func testWorkingURLsPath() throws {
-        let url = try cgjprofileTool.profileURL (path: "/Users/below/Library/MobileDevice/Provisioning Profiles/\(profileUUID).mobileprovision")
+        let url = try CgjProfileCore.profileURL (path: "/Users/below/Library/MobileDevice/Provisioning Profiles/\(profileUUID).mobileprovision")
         XCTAssertNotNil(url)
     }
     
     func testURLforUDID () throws {
-        let url = try cgjprofileTool.profileURL(path: profileUUID)
+        let url = try CgjProfileCore.profileURL(path: profileUUID)
         XCTAssertNotNil(url)
         let data = try Data(contentsOf: url)
         XCTAssertNotNil(data)
     }
     
     func testMobileProvisionDir() throws {
-        let urls = cgjprofileTool.profilePaths()
+        let urls = CgjProfileCore.profilePaths()
         XCTAssert(urls.count != 0)
     }
     
